@@ -1,0 +1,261 @@
+%% ExpenseMate - Class Diagram
+%% This diagram shows the class structure and relationships.
+%% Run with any Mermaid renderer.
+
+```mermaid
+classDiagram
+    %% Presentation Layer
+    class ExpenseMateApp {
+        - storage: Storage
+        - tm: TransactionManager
+        - expense_mgr: ExpenseManager
+        - income_mgr: IncomeManager
+        - budget_mgr: BudgetManager
+        - report_mgr: ReportManager
+        - export_mgr: ExportManager
+        - cli: CLIUtils
+        - validator: Validator
+        + run()
+        + print_welcome()
+        + print_main_menu()
+        + handle_main_menu(choice)
+        + add_expense()
+        + view_expenses()
+        + update_expense()
+        + delete_expense()
+        + add_income()
+        + view_income()
+        + update_income()
+        + delete_income()
+        + manage_budget()
+        + show_financial_summary()
+        + show_reports_menu()
+        + search_filter_menu()
+        + export_menu()
+        + show_help()
+        + exit_app()
+    }
+
+    class CLIUtils {
+        + clear_screen()
+        + print_header(title)
+        + print_menu(options, title)
+        + get_input(prompt, default)
+        + confirm(prompt)
+        + pause()
+        + print_table(headers, rows, col_widths)
+    }
+
+    %% Business Logic Layer
+    class ExpenseManager {
+        - tm: TransactionManager
+        - validator: Validator
+        - cli: CLIUtils
+        + add_expense_interactive()
+        + view_expenses(expenses)
+        + view_expense_detail(transaction_id)
+        + update_expense_interactive()
+        + delete_expense_interactive()
+        + filter_expenses_interactive()
+    }
+
+    class IncomeManager {
+        - tm: TransactionManager
+        - validator: Validator
+        - cli: CLIUtils
+        + add_income_interactive()
+        + view_income(income_list)
+        + view_income_detail(transaction_id)
+        + update_income_interactive()
+        + delete_income_interactive()
+    }
+
+    class BudgetManager {
+        - storage: Storage
+        - tm: TransactionManager
+        - validator: Validator
+        - warning_threshold: float
+        + set_budget(month, amount)
+        + get_budget(month)
+        + get_current_month_budget()
+        + delete_budget(month)
+        + get_all_budgets()
+        + calculate_budget_status(month)
+        + get_budget_summary(month)
+        + check_budget_alert(month)
+    }
+
+    class ReportManager {
+        - tm: TransactionManager
+        - budget_mgr: BudgetManager
+        + get_overall_summary()
+        + get_category_report(type)
+        + get_monthly_report(month)
+        + get_highest_spending_category()
+        + get_average_expense()
+        + get_largest_transaction(type)
+        + get_expense_distribution()
+        + get_monthly_trends(months)
+        + format_currency(amount)
+        + print_financial_summary()
+        + print_category_report(type)
+        + print_monthly_report(month)
+        + print_analytics()
+    }
+
+    class TransactionManager {
+        - storage: Storage
+        - validator: Validator
+        - expense_counter: int
+        - income_counter: int
+        + add_expense(date, amount, category, description)
+        + add_income(date, amount, category, description)
+        + get_all_transactions()
+        + get_expenses()
+        + get_income()
+        + get_transaction_by_id(id)
+        + update_transaction(id, **kwargs)
+        + delete_transaction(id)
+        + filter_transactions(type, category, start_date, end_date, min_amount, max_amount, keyword)
+        + search_transactions(keyword)
+        + get_transactions_by_month(month)
+        + get_expenses_by_month(month)
+        + get_income_by_month(month)
+        + calculate_total_expenses(transactions)
+        + calculate_total_income(transactions)
+        + calculate_balance()
+        + get_category_totals(type)
+        + get_monthly_summary(month)
+        - _generate_expense_id()
+        - _generate_income_id()
+        - _initialize_counters()
+    }
+
+    %% Data Access Layer
+    class Storage {
+        - data_dir: Path
+        - transactions_file: Path
+        - budgets_file: Path
+        + get_all_transactions()
+        + save_transactions(transactions)
+        + add_transaction(transaction)
+        + update_transaction(id, data)
+        + delete_transaction(id)
+        + get_transaction_by_id(id)
+        + get_all_budgets()
+        + save_budgets(budgets)
+        + add_or_update_budget(month, amount)
+        + get_budget(month)
+        + delete_budget(month)
+        - _ensure_data_files()
+        - _read_json(file_path)
+        - _write_json(file_path, data)
+    }
+
+    %% Validation Layer
+    class Validator {
+        + EXPENSE_CATEGORIES: list
+        + INCOME_CATEGORIES: list
+        + ALL_CATEGORIES: list
+        + validate_amount(amount_str)
+        + validate_date(date_str)
+        + validate_category(category, type)
+        + validate_description(description)
+        + validate_menu_choice(choice, valid_choices)
+        + validate_transaction_id(id, transactions)
+        + validate_month(month_str)
+        + validate_confirmation(confirm)
+        + get_category_choices(type)
+    }
+
+    %% Utility Layer
+    class ExportManager {
+        - tm: TransactionManager
+        - export_dir: Path
+        + export_all_transactions(filename)
+        + export_transactions_by_type(type, filename)
+        + export_transactions_by_month(month, filename)
+        + list_exports()
+        - _export_transactions(transactions, filename)
+    }
+
+    class Utils {
+        + format_currency(amount)
+        + get_current_month()
+        + parse_month_input(month_str)
+        + sort_transactions(transactions, key, reverse)
+    }
+
+    %% Relationships
+    ExpenseMateApp --> CLIUtils
+    ExpenseMateApp --> Storage
+    ExpenseMateApp --> TransactionManager
+    ExpenseMateApp --> ExpenseManager
+    ExpenseMateApp --> IncomeManager
+    ExpenseMateApp --> BudgetManager
+    ExpenseMateApp --> ReportManager
+    ExpenseMateApp --> ExportManager
+    ExpenseMateApp --> Validator
+
+    ExpenseManager --> TransactionManager
+    ExpenseManager --> Validator
+    ExpenseManager --> CLIUtils
+
+    IncomeManager --> TransactionManager
+    IncomeManager --> Validator
+    IncomeManager --> CLIUtils
+
+    BudgetManager --> Storage
+    BudgetManager --> TransactionManager
+    BudgetManager --> Validator
+
+    ReportManager --> TransactionManager
+    ReportManager --> BudgetManager
+
+    TransactionManager --> Storage
+    TransactionManager --> Validator
+
+    ExportManager --> TransactionManager
+
+    Utils ..> TransactionManager
+```
+
+---
+
+### Class Diagram Explanation
+
+**Layered Architecture (5 Layers):**
+
+**1. Presentation Layer**
+- `ExpenseMateApp`: Main controller, menu loop, routing
+- `CLIUtils`: Static utilities for terminal interaction
+
+**2. Business Logic Layer** (4 Managers + 1 Core)
+- `ExpenseManager`: Expense-specific interactive operations
+- `IncomeManager`: Income-specific interactive operations
+- `BudgetManager`: Budget CRUD + threshold alerts (80% warning, 100% exceeded)
+- `ReportManager`: Report generation + formatted printing
+- `TransactionManager`: **Core** - all transaction logic, filtering, ID generation
+
+**3. Data Access Layer**
+- `Storage`: JSON persistence with error handling (corrupted JSON, missing files, permissions)
+
+**4. Validation Layer**
+- `Validator`: All input validation (amount, date, category, menu, transaction ID, month)
+
+**5. Utility Layer**
+- `ExportManager`: CSV export with multiple filter options
+- `Utils`: Currency formatting, date parsing, sorting helpers
+
+**Key Relationships:**
+- `ExpenseMateApp` **composes** all managers (dependency injection via constructor)
+- Managers **delegate** to `TransactionManager` for core operations
+- `TransactionManager` **uses** `Storage` for persistence and `Validator` for input checks
+- `BudgetManager` directly uses `Storage` for budget files
+- `ReportManager` uses both `TransactionManager` and `BudgetManager`
+- `ExportManager` uses `TransactionManager` for data retrieval
+
+**ID Generation:**
+- `TransactionManager` maintains separate counters for expenses (EXP001+) and income (INC001+)
+- Counters initialized from existing data on startup (`_initialize_counters`)
+- Counters persist across sessions via JSON data

@@ -1,0 +1,59 @@
+@startuml
+title ExpenseMate - Sequence Diagram: Add Expense
+
+actor User
+participant "CLI\n(main.py)" as CLI
+participant "ExpenseManager" as ExpMgr
+participant "Validator" as Validator
+participant "TransactionManager" as TxnMgr
+participant "Storage" as Storage
+participant "JSON File" as JSON
+
+User -> CLI: Select "1. Add Expense"
+CLI -> ExpMgr: add_expense_interactive()
+
+ExpMgr -> User: Prompt "Date (YYYY-MM-DD)"
+User -> ExpMgr: Enter date
+ExpMgr -> Validator: validate_date(date)
+Validator --> ExpMgr: (valid, normalized_date, error)
+
+alt Invalid Date
+    ExpMgr -> User: Show error message
+    ExpMgr -> User: Re-prompt for date
+else Valid Date
+    ExpMgr -> User: Prompt "Amount"
+    User -> ExpMgr: Enter amount
+    ExpMgr -> Validator: validate_amount(amount)
+    Validator --> ExpMgr: (valid, amount_float, error)
+    
+    alt Invalid Amount
+        ExpMgr -> User: Show error message
+        ExpMgr -> User: Re-prompt for amount
+    else Valid Amount
+        ExpMgr -> User: Show category list
+        ExpMgr -> User: Prompt "Select category"
+        User -> ExpMgr: Enter category
+        ExpMgr -> Validator: validate_category(category, 'expense')
+        Validator --> ExpMgr: (valid, normalized_cat, warning)
+        
+        alt Invalid Category
+            ExpMgr -> User: Show error
+        else Valid Category
+            ExpMgr -> User: Prompt "Description (optional)"
+            User -> ExpMgr: Enter description (or empty)
+            ExpMgr -> Validator: validate_description(description)
+            Validator --> ExpMgr: (valid, normalized_desc, error)
+            
+            ExpMgr -> TxnMgr: add_expense(date, amount, category, description)
+            TxnMgr -> TxnMgr: _generate_expense_id()
+            TxnMgr -> Storage: add_transaction(transaction)
+            Storage -> JSON: Write transactions.json
+            JSON --> Storage: Success
+            Storage --> TxnMgr: True
+            TxnMgr --> ExpMgr: transaction object
+            ExpMgr -> User: "✓ Expense added! (ID: EXP001)"
+        end
+    end
+end
+
+@enduml

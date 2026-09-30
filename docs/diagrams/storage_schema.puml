@@ -1,0 +1,55 @@
+@startuml
+title ExpenseMate - Storage / Schema Diagram
+
+package "JSON File: transactions.json" {
+    class Transaction {
+        + id: String "EXP001 / INC001"
+        + date: String "YYYY-MM-DD"
+        + amount: Float "> 0"
+        + category: String "Food, Travel, Salary, etc."
+        + description: String "Optional"
+        + type: String "expense / income"
+    }
+    
+    note right of Transaction
+        Example Expense:
+        {
+            "id": "EXP001",
+            "date": "2026-09-30",
+            "amount": 450.0,
+            "category": "Food",
+            "description": "Dinner",
+            "type": "expense"
+        }
+        
+        Example Income:
+        {
+            "id": "INC001",
+            "date": "2026-09-30",
+            "amount": 25000.0,
+            "category": "Salary",
+            "description": "Monthly salary",
+            "type": "income"
+        }
+    end note
+}
+
+package "JSON File: budgets.json" {
+    class Budget {
+        + month: String "YYYY-MM"
+        + amount: Float "> 0"
+    }
+    
+    note right of Budget
+        Example:
+        {
+            "month": "2026-09",
+            "amount": 20000.0
+        }
+    end note
+}
+
+' Relationships
+Transaction --> Budget : "Filtered by month for\nbudget tracking"
+
+@enduml

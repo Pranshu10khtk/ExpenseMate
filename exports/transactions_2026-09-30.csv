@@ -1,0 +1,22 @@
+ID,Date,Amount,Category,Description,Type
+EXP001,2026-09-01,1200.0,Food,Monthly groceries,expense
+EXP002,2026-09-03,450.0,Travel,Bus pass,expense
+EXP003,2026-09-05,800.0,Food,Restaurant dinner,expense
+EXP004,2026-09-10,1500.0,Shopping,New shoes,expense
+EXP005,2026-09-12,200.0,Entertainment,Movie tickets,expense
+EXP006,2026-09-15,3000.0,Bills,Electricity bill,expense
+EXP007,2026-09-18,550.0,Food,Coffee and snacks,expense
+EXP008,2026-09-20,1200.0,Education,Online course,expense
+EXP009,2026-09-22,350.0,Transportation,Taxi fare,expense
+EXP010,2026-09-25,800.0,Health,Pharmacy,expense
+INC001,2026-09-01,25000.0,Salary,Monthly salary,income
+INC002,2026-09-10,5000.0,Freelance,Web design project,income
+INC003,2026-09-20,2000.0,Investment,Dividends,income
+EXP011,2026-09-25,5000.0,Food,Groceries,expense
+EXP012,2026-09-26,3000.0,Travel,Transport,expense
+EXP013,2026-09-27,8000.0,Shopping,Clothes,expense
+EXP014,2026-09-28,5000.0,Bills,Electricity,expense
+EXP015,2026-09-25,5000.0,Food,Groceries,expense
+EXP016,2026-09-26,3000.0,Travel,Transport,expense
+EXP017,2026-09-27,8000.0,Shopping,Clothes,expense
+EXP018,2026-09-28,5000.0,Bills,Electricity,expense

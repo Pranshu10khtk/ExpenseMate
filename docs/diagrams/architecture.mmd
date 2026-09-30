@@ -1,0 +1,127 @@
+%% ExpenseMate - System Architecture Diagram
+%% This diagram shows the layered architecture of the ExpenseMate application.
+%% Run this with any Mermaid renderer (VS Code, GitHub, Mermaid CLI, etc.)
+
+```mermaid
+flowchart TB
+    subgraph UserLayer["User"]
+        User["👤 User"]
+    end
+
+    subgraph PresentationLayer["Presentation Layer"]
+        CLI["🖥️ CLI Interface\n(main.py)"]
+        CLIUtils["🛠️ CLI Utilities\n(utils.CLIUtils)"]
+    end
+
+    subgraph ControllerLayer["Application Controller"]
+        App["🎮 ExpenseMateApp\nMain Controller"]
+    end
+
+    subgraph BusinessLayer["Business Logic Layer"]
+        ExpMgr["💰 ExpenseManager"]
+        IncMgr["💵 IncomeManager"]
+        BudMgr["📊 BudgetManager"]
+        RepMgr["📈 ReportManager"]
+    end
+
+    subgraph CoreLayer["Core Transaction Logic"]
+        TxnMgr["🔄 TransactionManager"]
+    end
+
+    subgraph ValidationLayer["Validation Layer"]
+        Validator["✅ Validator"]
+    end
+
+    subgraph DataLayer["Data Access Layer"]
+        Storage["💾 Storage"]
+    end
+
+    subgraph PersistenceLayer["Persistence"]
+        TransDB[("📄 transactions.json")]
+        BudDB[("📄 budgets.json")]
+    end
+
+    subgraph ExportLayer["Export"]
+        ExpMgr2["📤 ExportManager"]
+        ExportDB[("📊 exports/*.csv")]
+    end
+
+    %% User interaction
+    User --> CLI
+    CLI --> CLIUtils
+    CLI --> App
+
+    %% Controller to managers
+    App --> ExpMgr
+    App --> IncMgr
+    App --> BudMgr
+    App --> RepMgr
+    App --> ExpMgr2
+
+    %% Managers to core
+    ExpMgr --> TxnMgr
+    IncMgr --> TxnMgr
+    BudMgr --> TxnMgr
+    RepMgr --> TxnMgr
+    ExpMgr2 --> TxnMgr
+
+    %% Core to data & validation
+    TxnMgr --> Storage
+    TxnMgr --> Validator
+    BudMgr --> Storage
+    BudMgr --> Validator
+    ExpMgr --> Validator
+    IncMgr --> Validator
+
+    %% Storage to files
+    Storage --> TransDB
+    Storage --> BudDB
+    ExpMgr2 --> ExportDB
+
+    %% Styling
+    classDef user fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef presentation fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef controller fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef business fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    classDef core fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef validation fill:#fff8e1,stroke:#f57f17,stroke-width:2px
+    classDef data fill:#f1f8e9,stroke:#33691e,stroke-width:2px
+    classDef persistence fill:#eceff1,stroke:#37474f,stroke-width:2px
+    classDef export fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+
+    class User user
+    class CLI,CLIUtils presentation
+    class App controller
+    class ExpMgr,IncMgr,BudMgr,RepMgr business
+    class TxnMgr core
+    class Validator validation
+    class Storage data
+    class TransDB,BudDB persistence
+    class ExpMgr2,ExportDB export
+```
+
+---
+
+### Architecture Explanation
+
+**Layers (Top to Bottom):**
+
+1. **User Layer** - The human operator interacting via terminal
+2. **Presentation Layer** - `main.py` (CLI entry point) and `utils.CLIUtils` (screen clearing, menus, tables, input handling)
+3. **Application Controller** - `ExpenseMateApp` class orchestrates all managers, handles main menu loop, routes user choices
+4. **Business Logic Layer** - Domain-specific managers:
+   - `ExpenseManager`: Expense CRUD + interactive prompts
+   - `IncomeManager`: Income CRUD + interactive prompts  
+   - `BudgetManager`: Budget CRUD, threshold calculations, alerts
+   - `ReportManager`: Report generation, analytics, formatted output
+5. **Core Transaction Logic** - `TransactionManager`: Central transaction operations, ID generation, filtering, calculations
+6. **Validation Layer** - `Validator`: Amount, date, category, menu choice, transaction ID validation
+7. **Data Access Layer** - `Storage`: JSON file read/write with error handling
+8. **Persistence** - Two JSON files: `transactions.json` and `budgets.json`
+9. **Export** - `ExportManager`: CSV export to `exports/` directory
+
+**Key Design Patterns:**
+- **Dependency Injection**: Managers receive dependencies via constructor
+- **Single Responsibility**: Each class has one clear purpose
+- **Repository Pattern**: `Storage` abstracts file operations
+- **Factory Pattern**: `TransactionManager` generates sequential IDs (EXP001, INC001)

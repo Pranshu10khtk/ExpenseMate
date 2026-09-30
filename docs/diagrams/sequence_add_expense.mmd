@@ -1,0 +1,119 @@
+%% ExpenseMate - Sequence Diagram: Add Expense
+%% This diagram shows the detailed interaction for adding an expense.
+%% Run with any Mermaid renderer.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant CLI as CLI (main.py)
+    participant ExpMgr as ExpenseManager
+    participant Validator as Validator
+    participant TxnMgr as TransactionManager
+    participant Storage as Storage
+    participant JSON as transactions.json
+
+    Note over User,JSON: Add Expense Workflow
+
+    User->>CLI: Select "1. Add Expense"
+    CLI->>ExpMgr: add_expense_interactive()
+
+    %% Date input & validation
+    ExpMgr->>User: Prompt "Date (YYYY-MM-DD) [default]"
+    User->>ExpMgr: Enter date (or Enter for today)
+    ExpMgr->>Validator: validate_date(date_input)
+    alt Invalid Date
+        Validator-->>ExpMgr: (False, None, error_msg)
+        ExpMgr->>User: Show error: "Invalid date format"
+        ExpMgr->>User: Re-prompt for date
+    else Valid Date
+        Validator-->>ExpMgr: (True, normalized_date, "")
+        
+        %% Amount input & validation
+        ExpMgr->>User: Prompt "Amount"
+        User->>ExpMgr: Enter amount
+        ExpMgr->>Validator: validate_amount(amount_input)
+        alt Invalid Amount
+            Validator-->>ExpMgr: (False, None, error_msg)
+            ExpMgr->>User: Show error: "Amount must be > 0"
+            ExpMgr->>User: Re-prompt for amount
+        else Valid Amount
+            Validator-->>ExpMgr: (True, amount_float, "")
+            
+            %% Category selection & validation
+            ExpMgr->>User: Show category list (1-10 + Custom)
+            ExpMgr->>User: Prompt "Select category (number/name)"
+            User->>ExpMgr: Enter category
+            ExpMgr->>Validator: validate_category(category, 'expense')
+            alt Invalid Category
+                Validator-->>ExpMgr: (False, "", error_msg)
+                ExpMgr->>User: Show error
+            else Valid Category
+                Validator-->>ExpMgr: (True, normalized_category, warning?)
+                
+                %% Description (optional)
+                ExpMgr->>User: Prompt "Description (optional)"
+                User->>ExpMgr: Enter description (or empty)
+                ExpMgr->>Validator: validate_description(description)
+                Validator-->>ExpMgr: (True, normalized_desc, "")
+                
+                %% Create and save transaction
+                ExpMgr->>TxnMgr: add_expense(date, amount, category, description)
+                TxnMgr->>TxnMgr: _generate_expense_id() → "EXP001"
+                TxnMgr->>Storage: add_transaction(transaction_dict)
+                Storage->>JSON: Write transactions.json (append)
+                JSON-->>Storage: Success
+                Storage-->>TxnMgr: True
+                TxnMgr-->>ExpMgr: transaction object with ID
+                ExpMgr->>User: "✓ Expense added! (ID: EXP001)"
+            end
+        end
+    end
+
+    Note over User,CLI: Returns to Main Menu
+```
+
+---
+
+### Sequence Diagram Explanation
+
+**Participants:**
+- **User**: Human operator
+- **CLI**: `main.py` - entry point, menu display
+- **ExpenseManager**: Handles interactive expense prompts
+- **Validator**: Validates all inputs (date, amount, category, description)
+- **TransactionManager**: Core logic, ID generation, delegates to storage
+- **Storage**: JSON file read/write operations
+- **transactions.json**: Physical file on disk
+
+**Flow Details:**
+
+1. **User selects "Add Expense"** from main menu
+2. **Date validation loop**: 
+   - Prompts for date (defaults to today if empty)
+   - Validates YYYY-MM-DD format via `Validator.validate_date()`
+   - Re-prompts on invalid format or non-existent date (e.g., 2026-02-30)
+3. **Amount validation loop**:
+   - Prompts for amount
+   - Validates numeric, > 0 via `Validator.validate_amount()`
+   - Re-prompts on negative, zero, or non-numeric input
+4. **Category selection**:
+   - Displays 10 predefined expense categories + Custom option
+   - Accepts number (1-11) or category name
+   - Validates via `Validator.validate_category()` (case-insensitive match)
+   - Allows custom category with warning
+5. **Description**: Optional, trimmed, empty allowed
+6. **Transaction creation**:
+   - `TransactionManager.add_expense()` creates transaction dict
+   - Generates sequential ID: `_generate_expense_id()` → EXP001, EXP002...
+   - Delegates to `Storage.add_transaction()`
+7. **Persistence**:
+   - `Storage` reads existing transactions, appends new, writes back
+   - Handles file creation, corrupted JSON recovery, permissions
+8. **Success feedback**: Shows generated ID to user
+
+**Error Handling:**
+- All validation errors caught and displayed with specific messages
+- User re-prompted until valid input
+- No exceptions propagate to user
+- Storage errors (permissions, corruption) shown as user-friendly messages

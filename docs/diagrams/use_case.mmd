@@ -1,0 +1,89 @@
+%% ExpenseMate - Use Case Diagram
+%% This diagram shows the user interactions with the system.
+%% Run with any Mermaid renderer.
+
+```mermaid
+useCaseDiagram
+    actor User
+
+    package "ExpenseMate System" {
+        usecase "Add Expense" as UC1
+        usecase "View Expenses" as UC2
+        usecase "Update Expense" as UC3
+        usecase "Delete Expense" as UC4
+        usecase "Add Income" as UC5
+        usecase "View Income" as UC6
+        usecase "Update Income" as UC7
+        usecase "Delete Income" as UC8
+        usecase "Manage Budget" as UC9
+        usecase "View Financial Summary" as UC10
+        usecase "Generate Reports" as UC11
+        usecase "Search/Filter Transactions" as UC12
+        usecase "Export Data" as UC13
+        usecase "View Help" as UC14
+        usecase "Exit Application" as UC15
+    }
+
+    User --> UC1
+    User --> UC2
+    User --> UC3
+    User --> UC4
+    User --> UC5
+    User --> UC6
+    User --> UC7
+    User --> UC8
+    User --> UC9
+    User --> UC10
+    User --> UC11
+    User --> UC12
+    User --> UC13
+    User --> UC14
+    User --> UC15
+
+    %% Relationships between use cases
+    UC1 ..> UC2 : includes
+    UC3 ..> UC2 : extends
+    UC4 ..> UC2 : extends
+    UC5 ..> UC6 : includes
+    UC7 ..> UC6 : extends
+    UC8 ..> UC6 : extends
+    UC9 ..> UC10 : extends
+    UC11 ..> UC10 : extends
+    UC12 ..> UC2 : extends
+    UC12 ..> UC6 : extends
+    UC13 ..> UC2 : extends
+    UC13 ..> UC6 : extends
+```
+
+---
+
+### Use Case Explanation
+
+**Actor:** User (single user, no authentication)
+
+**Use Cases (mapped to menu options):**
+
+| # | Use Case | Menu Option | Description |
+|---|----------|-------------|-------------|
+| UC1 | Add Expense | 1 | Record new expense with date, amount, category, description |
+| UC2 | View Expenses | 2 | List all expenses in formatted table with totals |
+| UC3 | Update Expense | 3 | Modify existing expense (date, amount, category, description) |
+| UC4 | Delete Expense | 4 | Remove expense with confirmation |
+| UC5 | Add Income | 5 | Record income with source, amount, date, description |
+| UC6 | View Income | 6 | List all income records in formatted table |
+| UC7 | Update Income | 7 | Modify existing income record |
+| UC8 | Delete Income | 8 | Remove income with confirmation |
+| UC9 | Manage Budget | 9 | Set/view/delete monthly budgets, see usage % |
+| UC10 | View Financial Summary | 10 | Overall income, expenses, balance, counts |
+| UC11 | Generate Reports | 11 | Category reports, monthly, analytics, trends |
+| UC12 | Search/Filter Transactions | 12 | Filter by type, category, date, amount, keyword |
+| UC13 | Export Data | 13 | Export to CSV (all, expenses, income, by month) |
+| UC14 | View Help | 14 | Built-in help documentation |
+| UC15 | Exit Application | 0 | Clean shutdown |
+
+**Relationships:**
+- **Include (..>)**: Base use case includes another (e.g., Add Expense includes View Expenses for selection)
+- **Extend (..>)**: Optional extension (e.g., Update Expense extends View Expenses - you view first, then choose to update)
+
+**Not Modeled (Out of Scope):**
+- Multi-user, authentication, cloud sync, recurring transactions, GUI, API

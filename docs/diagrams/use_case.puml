@@ -1,0 +1,42 @@
+@startuml
+!define RECTANGLE class
+
+title ExpenseMate - Use Case Diagram
+
+actor User
+
+package "ExpenseMate System" {
+    usecase "Add Expense" as UC1
+    usecase "View Expenses" as UC2
+    usecase "Update Expense" as UC3
+    usecase "Delete Expense" as UC4
+    usecase "Add Income" as UC5
+    usecase "View Income" as UC6
+    usecase "Update Income" as UC7
+    usecase "Delete Income" as UC8
+    usecase "Manage Budget" as UC9
+    usecase "View Financial Summary" as UC10
+    usecase "Generate Reports" as UC11
+    usecase "Search Transactions" as UC12
+    usecase "Export Transactions" as UC13
+    usecase "View Help" as UC14
+    usecase "Exit Application" as UC15
+}
+
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC6
+User --> UC7
+User --> UC8
+User --> UC9
+User --> UC10
+User --> UC11
+User --> UC12
+User --> UC13
+User --> UC14
+User --> UC15
+
+@enduml

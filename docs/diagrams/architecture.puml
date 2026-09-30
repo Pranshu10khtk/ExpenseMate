@@ -1,0 +1,72 @@
+@startuml
+title ExpenseMate - System Architecture Diagram
+
+actor User
+
+package "Presentation Layer" {
+    [CLI Interface\n(main.py)]
+    [CLI Utilities\n(utils.py)]
+}
+
+package "Application Controller" {
+    [ExpenseMateApp\nMain Controller]
+}
+
+package "Business Logic Layer" {
+    [ExpenseManager]
+    [IncomeManager]
+    [BudgetManager]
+    [ReportManager]
+}
+
+package "Core Transaction Logic" {
+    [TransactionManager]
+}
+
+package "Validation Layer" {
+    [Validator]
+}
+
+package "Data Access Layer" {
+    [Storage]
+}
+
+package "Persistence" {
+    database "transactions.json" as TransDB
+    database "budgets.json" as BudgDB
+}
+
+package "Export" {
+    [ExportManager]
+    database "exports/*.csv" as ExportDB
+}
+
+' Connections
+User --> [CLI Interface\n(main.py)]
+[CLI Interface\n(main.py)] --> [CLI Utilities\n(utils.py)]
+[CLI Interface\n(main.py)] --> [ExpenseMateApp\nMain Controller]
+
+[ExpenseMateApp\nMain Controller] --> [ExpenseManager]
+[ExpenseMateApp\nMain Controller] --> [IncomeManager]
+[ExpenseMateApp\nMain Controller] --> [BudgetManager]
+[ExpenseMateApp\nMain Controller] --> [ReportManager]
+[ExpenseMateApp\nMain Controller] --> [ExportManager]
+
+[ExpenseManager] --> [TransactionManager]
+[IncomeManager] --> [TransactionManager]
+[BudgetManager] --> [TransactionManager]
+[ReportManager] --> [TransactionManager]
+[ExportManager] --> [TransactionManager]
+
+[TransactionManager] --> [Storage]
+[TransactionManager] --> [Validator]
+[BudgetManager] --> [Storage]
+[BudgetManager] --> [Validator]
+[ExpenseManager] --> [Validator]
+[IncomeManager] --> [Validator]
+
+[Storage] --> TransDB
+[Storage] --> BudgDB
+[ExportManager] --> ExportDB
+
+@enduml

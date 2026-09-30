@@ -1,0 +1,137 @@
+%% ExpenseMate - Storage / Schema Diagram
+%% This diagram shows the JSON data structures used for persistence.
+%% Run with any Mermaid renderer.
+
+```mermaid
+erDiagram
+    TRANSACTION ||--o{ BUDGET : "filtered by month for tracking"
+
+    TRANSACTION {
+        string id PK "EXP001 / INC001"
+        string date "YYYY-MM-DD"
+        float amount "> 0"
+        string category "Food, Travel, Salary, etc."
+        string description "Optional"
+        string type "expense / income"
+    }
+
+    BUDGET {
+        string month PK "YYYY-MM"
+        float amount "> 0"
+    }
+```
+
+---
+
+### JSON File Structure
+
+#### `data/transactions.json`
+Array of transaction objects:
+
+```json
+[
+  {
+    "id": "EXP001",
+    "date": "2026-09-01",
+    "amount": 1200.0,
+    "category": "Food",
+    "description": "Monthly groceries",
+    "type": "expense"
+  },
+  {
+    "id": "INC001",
+    "date": "2026-09-01",
+    "amount": 25000.0,
+    "category": "Salary",
+    "description": "Monthly salary",
+    "type": "income"
+  }
+]
+```
+
+#### `data/budgets.json`
+Array of budget objects:
+
+```json
+[
+  {
+    "month": "2026-09",
+    "amount": 20000.0
+  },
+  {
+    "month": "2026-08",
+    "amount": 15000.0
+  }
+]
+```
+
+---
+
+### Field Details
+
+| File | Field | Type | Constraints | Example |
+|------|-------|------|-------------|---------|
+| transactions.json | id | string | PK, format: EXP### or INC### | "EXP001" |
+| transactions.json | date | string | YYYY-MM-DD, valid date | "2026-09-30" |
+| transactions.json | amount | float | > 0 | 450.0 |
+| transactions.json | category | string | Non-empty | "Food" |
+| transactions.json | description | string | Optional, can be empty | "Dinner" |
+| transactions.json | type | string | "expense" or "income" | "expense" |
+| budgets.json | month | string | PK, YYYY-MM | "2026-09" |
+| budgets.json | amount | float | > 0 | 20000.0 |
+
+---
+
+### ID Generation Logic
+
+**Expense IDs:** `EXP` + 3-digit zero-padded counter
+- First expense: `EXP001`
+- Second: `EXP002`
+- Counter persists in TransactionManager, initialized from existing data
+
+**Income IDs:** `INC` + 3-digit zero-padded counter
+- First income: `INC001`
+- Counter separate from expense counter
+
+**Budget Keys:** Month string `YYYY-MM` (e.g., "2026-09")
+- One budget per month
+- Updated by replacing existing entry
+
+---
+
+### Relationship Explanation
+
+**Transaction → Budget (Conceptual)**
+- Transactions are **filtered by month** (date prefix) to calculate budget usage
+- Budget status calculated by: `expenses_in_month / budget_amount * 100`
+- No foreign key in JSON - relationship computed at runtime
+- Multiple months independent (Sep 2026 budget doesn't affect Aug 2026)
+
+---
+
+### Storage Implementation Notes
+
+**Storage Class Methods:**
+- `get_all_transactions()` → List[dict]
+- `save_transactions(list)` → bool
+- `add_transaction(dict)` → bool
+- `update_transaction(id, dict)` → bool
+- `delete_transaction(id)` → bool
+- `get_transaction_by_id(id)` → dict or None
+- `get_all_budgets()` → List[dict]
+- `save_budgets(list)` → bool
+- `add_or_update_budget(month, amount)` → bool
+- `get_budget(month)` → dict or None
+- `delete_budget(month)` → bool
+
+**Error Handling:**
+- Missing files → create empty arrays
+- Empty files → treat as empty arrays
+- Corrupted JSON → warning + return empty array
+- Permission errors → user-friendly message, return False
+- Atomic writes: read → modify → write (no partial writes)
+
+**Auto-Creation:**
+- `data/` directory created on first run
+- `transactions.json` and `budgets.json` created if missing
+- No manual setup required

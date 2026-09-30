@@ -1,0 +1,257 @@
+%% ExpenseMate - Workflow Diagram
+%% This diagram shows the main application workflows.
+%% Run with any Mermaid renderer.
+
+```mermaid
+flowchart TD
+    %% Startup
+    Start([Start Application]) --> InitStorage[Initialize Storage]
+    InitStorage --> LoadTM[Load TransactionManager]
+    LoadTM --> LoadEM[Load ExpenseManager]
+    LoadEM --> LoadIM[Load IncomeManager]
+    LoadIM --> LoadBM[Load BudgetManager]
+    LoadBM --> LoadRM[Load ReportManager]
+    LoadRM --> LoadExp[Load ExportManager]
+    LoadExp --> Banner[Display Welcome Banner]
+    Banner --> Menu[Show Main Menu]
+    Menu --> Choice{User Choice}
+
+    %% Main Menu Options
+    Choice -->|1| AddExp[Add Expense]
+    Choice -->|2| ViewExp[View Expenses]
+    Choice -->|3| UpdExp[Update Expense]
+    Choice -->|4| DelExp[Delete Expense]
+    Choice -->|5| AddInc[Add Income]
+    Choice -->|6| ViewInc[View Income]
+    Choice -->|7| UpdInc[Update Income]
+    Choice -->|8| DelInc[Delete Income]
+    Choice -->|9| Bud[Manage Budget]
+    Choice -->|10| Sum[Financial Summary]
+    Choice -->|11| Rep[Reports & Analytics]
+    Choice -->|12| Search[Search/Filter]
+    Choice -->|13| Exp[Export Data]
+    Choice -->|14| Help[Show Help]
+    Choice -->|0| Exit[Exit Application]
+
+    %% Return to menu
+    AddExp --> Menu
+    ViewExp --> Menu
+    UpdExp --> Menu
+    DelExp --> Menu
+    AddInc --> Menu
+    ViewInc --> Menu
+    UpdInc --> Menu
+    DelInc --> Menu
+    Bud --> Menu
+    Sum --> Menu
+    Rep --> Menu
+    Search --> Menu
+    Exp --> Menu
+    Help --> Menu
+    Exit --> Save[Save & Exit]
+
+    %% Add Expense Detail
+    AddExp --> ExpDate[Prompt Date]
+    ExpDate --> ExpDateValid{Valid Date?}
+    ExpDateValid -->|No| ExpDate
+    ExpDateValid -->|Yes| ExpAmt[Prompt Amount]
+    ExpAmt --> ExpAmtValid{Valid Amount?}
+    ExpAmtValid -->|No| ExpAmt
+    ExpAmtValid -->|Yes| ExpCat[Show Categories]
+    ExpCat --> ExpCatPrompt[Prompt Category]
+    ExpCatPrompt --> ExpCatValid{Valid Category?}
+    ExpCatValid -->|No| ExpCatPrompt
+    ExpCatValid -->|Yes| ExpDesc[Prompt Description]
+    ExpDesc --> ExpGenID[Generate EXP ID]
+    ExpGenID --> ExpSave[Save to Storage]
+    ExpSave --> ExpResult{Success?}
+    ExpResult -->|No| ExpErr[Show Error]
+    ExpResult -->|Yes| ExpOK[Show Success]
+    ExpErr --> Menu
+    ExpOK --> Menu
+
+    %% Add Income Detail
+    AddInc --> IncDate[Prompt Date]
+    IncDate --> IncDateValid{Valid Date?}
+    IncDateValid -->|No| IncDate
+    IncDateValid -->|Yes| IncAmt[Prompt Amount]
+    IncAmt --> IncAmtValid{Valid Amount?}
+    IncAmtValid -->|No| IncAmt
+    IncAmtValid -->|Yes| IncCat[Show Income Categories]
+    IncCat --> IncCatPrompt[Prompt Category]
+    IncCatPrompt --> IncCatValid{Valid Category?}
+    IncCatValid -->|No| IncCatPrompt
+    IncCatValid -->|Yes| IncDesc[Prompt Description]
+    IncDesc --> IncGenID[Generate INC ID]
+    IncGenID --> IncSave[Save to Storage]
+    IncSave --> IncResult{Success?}
+    IncResult -->|No| IncErr[Show Error]
+    IncResult -->|Yes| IncOK[Show Success]
+    IncErr --> Menu
+    IncOK --> Menu
+
+    %% Budget Management Detail
+    Bud --> BudShow[Show Current Budget]
+    BudShow --> BudChoice{User Choice}
+    BudChoice -->|1| BudSet[Set/Update Budget]
+    BudChoice -->|2| BudView[View Budget Status]
+    BudChoice -->|3| BudDel[Delete Budget]
+    BudChoice -->|0| Menu
+    BudSet --> BudMonth[Prompt Month]
+    BudMonth --> BudAmt[Prompt Amount]
+    BudAmt --> BudAmtValid{Valid Amount?}
+    BudAmtValid -->|No| BudAmt
+    BudAmtValid -->|Yes| BudSave[Save Budget]
+    BudSave --> BudShow
+    BudView --> BudCalc[Calculate Status]
+    BudCalc --> BudDisplay[Display Details]
+    BudDisplay --> BudShow
+    BudDel --> BudConfirm{Confirmed?}
+    BudConfirm -->|Yes| BudRemove[Remove Budget]
+    BudConfirm -->|No| BudShow
+    BudRemove --> BudShow
+
+    %% Reports Detail
+    Rep --> RepChoice{Report Type}
+    RepChoice -->|1| RepCatExp[Category Expense Report]
+    RepChoice -->|2| RepCatInc[Category Income Report]
+    RepChoice -->|3| RepMonth[Monthly Report]
+    RepChoice -->|4| RepAnal[Spending Analytics]
+    RepChoice -->|5| RepTrend[Monthly Trends]
+    RepChoice -->|0| Menu
+    RepCatExp --> RepCatCalc[Calculate Totals & %]
+    RepCatCalc --> RepCatDisplay[Display Table]
+    RepCatDisplay --> Menu
+    RepCatInc --> RepIncCalc[Calculate Totals & %]
+    RepIncCalc --> RepIncDisplay[Display Table]
+    RepIncDisplay --> Menu
+    RepMonth --> RepMonthPrompt[Prompt Month]
+    RepMonthPrompt --> RepMonthGet[Get Monthly Summary]
+    RepMonthGet --> RepMonthBudget[Get Budget Status]
+    RepMonthBudget --> RepMonthDisplay[Display Report]
+    RepMonthDisplay --> Menu
+    RepAnal --> RepHigh[Highest Category]
+    RepHigh --> RepAvg[Average Expense]
+    RepAvg --> RepLarge[Largest Transactions]
+    RepLarge --> RepDist[Distribution]
+    RepDist --> RepAnalDisplay[Display Analytics]
+    RepAnalDisplay --> Menu
+    RepTrend --> RepTrendCalc[Calculate 6-Month Trends]
+    RepTrendCalc --> RepTrendDisplay[Display Trends]
+    RepTrendDisplay --> Menu
+
+    %% Search/Filter Detail
+    Search --> SearchChoice{Filter Type}
+    SearchChoice -->|1| SearchExp[Filter Expenses]
+    SearchChoice -->|2| SearchInc[Filter Income]
+    SearchChoice -->|3| SearchKey[Search by Keyword]
+    SearchChoice -->|4| SearchMonth[View by Month]
+    SearchChoice -->|5| SearchAll[View All]
+    SearchChoice -->|0| Menu
+    SearchExp --> SearchExpOpts[Show Filter Options]
+    SearchExpOpts --> SearchExpCat[Prompt Category]
+    SearchExpCat --> SearchExpDate[Prompt Date Range]
+    SearchExpDate --> SearchExpAmt[Prompt Amount Range]
+    SearchExpAmt --> SearchExpApply[Apply Filters]
+    SearchExpApply --> SearchExpDisplay[Display Results]
+    SearchExpDisplay --> Menu
+    SearchInc --> SearchIncOpts[Show Filter Options]
+    SearchIncOpts --> SearchIncApply[Apply Filters]
+    SearchIncApply --> SearchIncDisplay[Display Results]
+    SearchIncDisplay --> Menu
+    SearchKey --> SearchKeyPrompt[Prompt Keyword]
+    SearchKeyPrompt --> SearchKeyExec[Search Descriptions]
+    SearchKeyExec --> SearchKeyDisplay[Display Results]
+    SearchKeyDisplay --> Menu
+    SearchMonth --> SearchMonthPrompt[Prompt Month]
+    SearchMonthPrompt --> SearchMonthGet[Get Month Transactions]
+    SearchMonthGet --> SearchMonthDisplay[Display with Summary]
+    SearchMonthDisplay --> Menu
+    SearchAll --> SearchAllGet[Get All Transactions]
+    SearchAllGet --> SearchAllDisplay[Display All]
+    SearchAllDisplay --> Menu
+
+    %% Export Detail
+    Exp --> ExpChoice{Export Type}
+    ExpChoice -->|1| ExpAll[Export All]
+    ExpChoice -->|2| ExpExp[Export Expenses]
+    ExpChoice -->|3| ExpInc[Export Income]
+    ExpChoice -->|4| ExpMonth[Export by Month]
+    ExpChoice -->|5| ExpList[List Exports]
+    ExpChoice -->|0| Menu
+    ExpAll --> ExpGen[Generate Filename]
+    ExpGen --> ExpWrite[Write CSV]
+    ExpWrite --> ExpWriteOK{Success?}
+    ExpWriteOK -->|No| ExpErr[Show Error]
+    ExpWriteOK -->|Yes| ExpOKMsg[Show Success + Path]
+    ExpErr --> Menu
+    ExpOKMsg --> Menu
+    ExpExp --> ExpExpFilter[Filter Expenses]
+    ExpExpFilter --> ExpGen
+    ExpInc --> ExpIncFilter[Filter Income]
+    ExpIncFilter --> ExpGen
+    ExpMonth --> ExpMonthPrompt[Prompt Month]
+    ExpMonthPrompt --> ExpMonthFilter[Filter by Month]
+    ExpMonthFilter --> ExpGen
+    ExpList --> ExpListDir[List Export Directory]
+    ExpListDir --> ExpListDisplay[Display Files]
+    ExpListDisplay --> Menu
+
+    %% Styling
+    classDef startend fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef menu fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    classDef process fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef decision fill:#ffe0b2,stroke:#ef6c00,stroke-width:2px
+    classDef error fill:#ffcdd2,stroke:#c62828,stroke-width:2px
+
+    class Start,Save startend
+    class Menu,Choice,BudChoice,RepChoice,SearchChoice,ExpChoice menu
+    class AddExp,ViewExp,UpdExp,DelExp,AddInc,ViewInc,UpdInc,DelInc,Bud,Sum,Rep,Search,Exp,Help process
+    class ExpDateValid,ExpAmtValid,ExpCatValid,IncDateValid,IncAmtValid,IncCatValid,BudAmtValid,ExpWriteOK,BudConfirm process
+    class ExpErr,IncErr error
+```
+
+---
+
+### Workflow Explanation
+
+**Application Startup:**
+1. Initialize all managers (Storage → TransactionManager → Expense/Income/Budget/Report/Export managers)
+2. Display welcome banner
+4. Show main menu with 14 options + Exit
+
+**Main Menu Navigation:**
+- Each option (1-14) routes to its respective handler
+- All handlers return to main menu after completion
+- Option 0 saves and exits cleanly
+
+**Key Workflows:**
+
+**Add Expense (Option 1):**
+- Prompt date → validate → prompt amount → validate → show categories → prompt category → validate → prompt description → generate EXP ID → save → show result
+
+**Add Income (Option 5):**
+- Same pattern as expense but with income categories (Salary, Freelance, etc.) and INC IDs
+
+**Budget Management (Option 9):**
+- Shows current budget status
+- Submenu: Set/Update (1), View Details (2), Delete (3), Back (0)
+- Validates budget amount > 0
+
+**Reports (Option 11):**
+- 5 report types: Category Expense, Category Income, Monthly, Analytics, Trends
+- All calculate data from TransactionManager and display formatted output
+
+**Search/Filter (Option 12):**
+- 5 filter types: Expenses, Income, Keyword, Month, All
+- Supports combined filters (category + date range + amount range)
+
+**Export (Option 13):**
+- 4 export types + list previous exports
+- Generates timestamped CSV files in `exports/`
+- CSV format: ID,Date,Amount,Category,Description,Type
+
+**Validation First Principle:**
+- Every input validated before processing
+- Errors show specific message and re-prompt
+- No crashes from invalid input
